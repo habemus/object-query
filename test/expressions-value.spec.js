@@ -1,8 +1,14 @@
-import { expression, $VALUE } from '../src'
+import {
+  expression,
+  $VALUE,
+  VALUE_EXPRESSIONS
+} from '../src'
 
-describe('core expressions', () => {
+describe('VALUE_EXPRESSIONS', () => {
 
-  const evaluate = expression({})
+  const evaluate = expression({
+    ...VALUE_EXPRESSIONS,
+  })
 
   const NUMBER = 123
   const STRING = 'String value'
@@ -33,7 +39,6 @@ describe('core expressions', () => {
   })
 
   describe('$path', () => {
-
     test('root', () => {
       expect(evaluate(['$path', null], NUMBER)).toEqual(NUMBER)
       expect(evaluate(['$path', null], STRING)).toEqual(STRING)

@@ -8,51 +8,43 @@ import {
   validateArray
 } from '../util'
 
-export const $EQ = '$eq'
-const $eq = (options, valueA, valueB) => {
-  return isEqual(valueA, valueB)
+import { evaluate } from '../expression'
+import {
+  evaluateArray,
+  evaluateNumber
+} from '../expression-util'
+
+const $eq = (options, valueAExp, valueBExp) => {
+  return isEqual(
+    evaluate(options, valueAExp),
+    evaluate(options, valueBExp)
+  )
 }
 
-export const $NE = '$ne'
-const $ne = (options, valueA, valueB) => {
-  return !isEqual(valueA, valueB)
+const $ne = (options, valueAExp, valueBExp) => !$eq(options, valueAExp, valueBExp)
+
+const $in = (options, arrayExp, valueExp) => {
+  const value = evaluate(options, valueExp)
+  return evaluateArray(options, arrayExp).some(item => item === value)
 }
 
-export const $IN = '$in'
-const $in = (options, array, value) => {
-  validateArray(array)
-  return array.some(arrayItem => arrayItem === value)
-}
+const $nin = (options, arrayExp, valueExp) => !$in(options, arrayExp, valueExp)
 
-export const $NIN = '$nin'
-const $nin = (options, array, value) => {
-  validateArray(array)
-  return !array.some(arrayItem => arrayItem === value)
-}
-
-export const $GT = '$gt'
-const $gt = (options, threshold, value) => {
-  validateNumber(threshold)
+const $gt = (options, thresholdExp, valueExp) => {
+  const threshold = evaluateNumber(options, thresholdExp)
+  const value = evaluate(options, valueExp)
   return isValidNumber(value) && value > threshold
 }
 
-export const $GTE = '$gte'
-const $gte = (options, threshold, value) => {
-  validateNumber(threshold)
+const $gte = (options, thresholdExp, valueExp) => {
+  const threshold = evaluateNumber(options, thresholdExp)
+  const value = evaluate(options, valueExp)
   return isValidNumber(value) && value >= threshold
 }
 
-export const $LT = '$lt'
-const $lt = (options, threshold, value) => {
-  validateNumber(threshold)
-  return isValidNumber(value) && value < threshold
-}
+const $lt = (options, thresholdExp, valueExp) => !$gte(options, thresholdExp, valueExp)
 
-export const $LTE = '$lte'
-const $lte = (options, threshold, value) => {
-  validateNumber(threshold)
-  return isValidNumber(value) && value <= threshold
-}
+const $lte = (options, thresholdExp, valueExp) => !$gt(options, thresholdExp, valueExp)
 
 export const COMPARISON_EXPRESSIONS = {
   $eq,

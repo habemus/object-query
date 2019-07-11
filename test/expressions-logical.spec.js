@@ -1,13 +1,15 @@
 import {
   expression,
+  $VALUE,
+  VALUE_EXPRESSIONS,
   COMPARISON_EXPRESSIONS,
   LOGICAL_EXPRESSIONS,
-  $VALUE,
 } from '../src'
 
 describe('logical expressions', () => {
 
   const evaluate = expression({
+    ...VALUE_EXPRESSIONS,
     ...COMPARISON_EXPRESSIONS,
     ...LOGICAL_EXPRESSIONS,
   })
@@ -44,7 +46,7 @@ describe('logical expressions', () => {
     expect(evaluate(expression, 10)).toEqual(true)
   })
 
-  test('$and - with nested $or', () => {
+  test('$or - with nested $and', () => {
     const expression = [
       '$or',
       [

@@ -89,10 +89,10 @@ describe('object operators', () => {
     })
   })
 
-  describe('$objectMap', () => {
+  describe('$transform', () => {
     test('basic', () => {
       const expression = [
-        '$objectMap',
+        '$transform',
         {
           name: 'relatives.0.name',
           familyName: 'relatives.0.familyName',
@@ -109,7 +109,7 @@ describe('object operators', () => {
       const expression = [
         '$eq',
         [
-          '$objectMap',
+          '$transform',
           {
             name: 'relatives.1.name',
             familyName: 'relatives.1.familyName',

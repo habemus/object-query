@@ -2,19 +2,38 @@ import {
   isPlainObject
 } from 'lodash'
 
+import { validateArray } from '../util'
+
 import { evaluate } from '../expression'
 
-export const $AND = '$and'
-const $and = ({ context, operators }, ...expressions) => {
-  return expressions.every(exp => evaluate(operators, exp, context))
+const $and = (options, ...expressions) => {
+  validateArray(expressions)
+
+  return expressions.every(exp => evaluate(options, exp))
 }
 
-export const $OR = '$or'
-const $or = ({ context, operators }, ...expressions) => {
-  return expressions.some(exp => evaluate(operators, exp, context))
+const $or = (options, ...expressions) => {
+  validateArray(expressions)
+
+  return expressions.some(exp => evaluate(options, exp))
+}
+
+const $not = (options, expression) => {
+  return !evaluate(options, expression)
+}
+
+const $nor = (options, ...expressions) => !$or(options, ...expressions)
+
+const $if = (options, conditionExp, thenExp, elseExp) => {
+  return evaluate(options, conditionExp) ?
+    evaluate(options, thenExp) :
+    evaluate(options, elseExp)
 }
 
 export const LOGICAL_EXPRESSIONS = {
   $and,
-  $or
+  $or,
+  $not,
+  $nor,
+  $if
 }

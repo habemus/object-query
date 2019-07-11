@@ -1,32 +1,31 @@
-import { curry } from 'lodash'
+import { curry, isPlainObject } from 'lodash'
 
-import {
-  CORE_EXPRESSIONS
-} from './expressions/core'
+export const isExpression = (options, value) => {
+  return Array.isArray(value) && typeof options.interpreters[value[0]] === 'function'
+}
 
-export const evaluate = (interpreters, expression, context) => {
+export const evaluate = (options, expression) => {
   if (!Array.isArray(expression)) {
     return expression
   }
 
-  const [expressionId, ...args] = expression
+  const [expressionId, ...expressionArgs] = expression
+  const { interpreters, context, $ROOT } = options
 
-  if (CORE_EXPRESSIONS[expressionId]) {
-    return CORE_EXPRESSIONS[expressionId]({ interpreters, context }, ...args)
-  } else {
+  // console.log('evaluate', expressionId, expressionArgs)
 
-    // console.log('evaluate', expressionId, ...args, context)
-
-    return typeof interpreters[expressionId] !== 'function' ?
-      expression :
-      interpreters[expressionId](
-        {
-          interpreters,
-          context
-        },
-        ...args.map(arg => evaluate(interpreters, arg, context))
-      )
-  }
+  return typeof interpreters[expressionId] === 'function' ?
+    interpreters[expressionId]({
+      interpreters,
+      $ROOT: $ROOT !== undefined ? $ROOT : context,
+      context
+    }, ...expressionArgs) :
+    expression
 }
 
-export const expression = curry(evaluate)
+export const expression = curry((interpreters, exp, context) => {
+  return evaluate({
+    interpreters,
+    context,
+  }, exp)
+})

@@ -2,23 +2,44 @@ import {
   validateNumber
 } from '../util'
 
-export const $SUM = '$sum'
-const $sum = (options, ...values) => {
-  return values.reduce((res, value) => {
-    validateNumber(value)
-    return res + value
+import { evaluate } from '../expression'
+
+import { evaluateNumber } from '../expression-util'
+
+const $mathSum = (options, ...valuesExps) => {
+  return valuesExps.reduce((res, valueExp) => {
+    return res + evaluateNumber(options, valueExp)
   }, 0)
 }
 
-export const $SUBTRACT = '$subtract'
-const $subtract = (options, base, ...values) => {
-  return values.reduce((res, value) => {
-    validateNumber(value)
-    return res - value
-  }, base)
+const $mathSubtract = (options, startExp, ...valueExps) => {
+  return valueExps.reduce((res, valueExp) => {
+    return res - evaluateNumber(options, valueExp)
+  }, evaluateNumber(options, startExp))
+}
+
+const $mathMod = (options, dividendExp, divisorExp) => {
+  return evaluateNumber(options, dividendExp) % evaluateNumber(options, divisorExp)
+}
+
+const $mathAbs = (options, value) => {
+
+}
+
+const $mathAvg = (options, ...values) => {
+
+}
+
+const $mathMax = (options, ...values) => {
+
+}
+
+const $mathMin = (options, ...values) => {
+
 }
 
 export const MATH_EXPRESSIONS = {
-  $sum,
-  $subtract
+  $mathSum,
+  $mathSubtract,
+  $mathMod,
 }

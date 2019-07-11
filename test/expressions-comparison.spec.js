@@ -1,11 +1,13 @@
 import {
   expression,
+  VALUE_EXPRESSIONS,
   COMPARISON_EXPRESSIONS,
 } from '../src'
 
 describe('comparison expressions', () => {
 
   const evaluate = expression({
+    ...VALUE_EXPRESSIONS,
     ...COMPARISON_EXPRESSIONS
   })
 
@@ -69,34 +71,34 @@ describe('comparison expressions', () => {
     expect(evaluate(['$lte', 10, 11], null)).toEqual(false)
   })
 
-  test('$in', () => {
+  test('$IN', () => {
     const tags = ['tag-1', 'tag-2', 'tag-3']
     expect(evaluate([
-      '$in',
+      '$IN',
       tags,
       ['$path', null]
     ], 'tag-3'))
     .toEqual(true)
 
     expect(evaluate([
-      '$in',
+      '$IN',
       tags,
       ['$path', null]
     ], 'tag-4'))
     .toEqual(false)
   })
 
-  test('$nin', () => {
+  test('$NIN', () => {
     const tags = ['tag-1', 'tag-2', 'tag-3']
     expect(evaluate([
-      '$nin',
+      '$NIN',
       tags,
       ['$path', null]
     ], 'tag-3'))
     .toEqual(false)
 
     expect(evaluate([
-      '$nin',
+      '$NIN',
       tags,
       ['$path', null]
     ], 'tag-4'))

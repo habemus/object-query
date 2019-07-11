@@ -1,5 +1,5 @@
 export const isValidNumber = value => {
-  return typeof value === 'number' || value !== NaN
+  return typeof value === 'number' && value !== NaN
 }
 
 export const validateNumber = value => {
