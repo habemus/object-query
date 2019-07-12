@@ -1,6 +1,8 @@
 import {
   expression,
   VALUE_EXPRESSIONS,
+  LOGICAL_EXPRESSIONS,
+  MATH_EXPRESSIONS,
   COMPARISON_EXPRESSIONS,
 } from '../src'
 
@@ -8,12 +10,14 @@ describe('comparison expressions', () => {
 
   const evaluate = expression({
     ...VALUE_EXPRESSIONS,
+    ...LOGICAL_EXPRESSIONS,
+    ...MATH_EXPRESSIONS,
     ...COMPARISON_EXPRESSIONS
   })
 
   test('$eq - primitives', () => {
-    const valueEq10 = ['$eq', ['$path', null], 10]
-    const valueEqTrue = ['$eq', ['$path', null], true]
+    const valueEq10 = ['$eq', ['$value', null], 10]
+    const valueEqTrue = ['$eq', ['$value', null], true]
 
     expect(evaluate(valueEq10, 10)).toEqual(true)
     expect(evaluate(valueEq10, 11)).toEqual(false)
@@ -25,7 +29,7 @@ describe('comparison expressions', () => {
   })
 
   test('$eq - object', () => {
-    const expression = ['$eq', ['$path', null], {
+    const expression = ['$eq', ['$value', null], {
       title: 'Test title',
       nested: {
         key: 'nested value',
@@ -43,8 +47,8 @@ describe('comparison expressions', () => {
     })).toEqual(true)
   })
 
-  test('$ne - primitives', () => {
-    expect(evaluate(['$ne', ['$path', null], 10], 11)).toEqual(true)
+  test('$notEq - primitives', () => {
+    expect(evaluate(['$notEq', ['$value', null], 10], 11)).toEqual(true)
   })
 
   test('$gt', () => {
@@ -71,36 +75,36 @@ describe('comparison expressions', () => {
     expect(evaluate(['$lte', 10, 11], null)).toEqual(false)
   })
 
-  test('$IN', () => {
+  test('$in', () => {
     const tags = ['tag-1', 'tag-2', 'tag-3']
     expect(evaluate([
-      '$IN',
+      '$in',
       tags,
-      ['$path', null]
+      ['$value', null]
     ], 'tag-3'))
     .toEqual(true)
 
     expect(evaluate([
-      '$IN',
+      '$in',
       tags,
-      ['$path', null]
+      ['$value', null]
     ], 'tag-4'))
     .toEqual(false)
   })
 
-  test('$NIN', () => {
+  test('$nin', () => {
     const tags = ['tag-1', 'tag-2', 'tag-3']
     expect(evaluate([
-      '$NIN',
+      '$nin',
       tags,
-      ['$path', null]
+      ['$value', null]
     ], 'tag-3'))
     .toEqual(false)
 
     expect(evaluate([
-      '$NIN',
+      '$nin',
       tags,
-      ['$path', null]
+      ['$value', null]
     ], 'tag-4'))
     .toEqual(true)
   })

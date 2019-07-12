@@ -1,6 +1,6 @@
 import {
   expression,
-  $VALUE,
+  $$VALUE,
   VALUE_EXPRESSIONS,
   COMPARISON_EXPRESSIONS,
   LOGICAL_EXPRESSIONS,
@@ -16,8 +16,8 @@ describe('logical expressions', () => {
 
   test('$and - basic', () => {
 
-    const greaterThan10 = ['$gt', 10, $VALUE]
-    const lesserThan20 = ['$lt', 20, $VALUE]
+    const greaterThan10 = ['$gt', 10, $$VALUE]
+    const lesserThan20 = ['$lt', 20, $$VALUE]
 
     const expression = [
       '$and',
@@ -32,8 +32,8 @@ describe('logical expressions', () => {
   })
 
   test('$or - basic', () => {
-    const lesserThanOrEqual10 = ['$lte', 10, $VALUE]
-    const greaterThanOrEqual20 = ['$gte', 20, $VALUE]
+    const lesserThanOrEqual10 = ['$lte', 10, $$VALUE]
+    const greaterThanOrEqual20 = ['$gte', 20, $$VALUE]
 
     const expression = [
       '$or',
@@ -51,16 +51,16 @@ describe('logical expressions', () => {
       '$or',
       [
         '$and',
-        ['$gt', 10, $VALUE],
-        ['$lt', 30, $VALUE]
+        ['$gt', 10, $$VALUE],
+        ['$lt', 30, $$VALUE]
       ],
       [
         '$and',
-        ['$gt', 50, $VALUE],
-        ['$lt', 70, $VALUE]
+        ['$gt', 50, $$VALUE],
+        ['$lt', 70, $$VALUE]
       ],
       [
-        '$eq', 5, $VALUE
+        '$eq', 5, $$VALUE
       ]
     ]
 

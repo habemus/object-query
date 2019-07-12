@@ -1,4 +1,8 @@
 import {
+  curry
+} from 'lodash'
+
+import {
   evaluate,
   isExpression
 } from './expression'
@@ -7,14 +11,30 @@ import {
   validateArray,
   validateNumber,
   validateString,
+  validateRegExp,
+  validateStringOrRegExp,
   validatePlainObject,
+  validateBoolean,
+  validateNotObject,
+  validatePlainObjectOrArray
 } from './util'
 
-const _evaluate = (validate, options, exp) => {
-  const value = evaluate(options, exp)
-  validate(value)
+const _evaluate = (validate) => {
+  const evaluateAndValidate = (options, exp) => {
+    const value = evaluate(options, exp)
+    validate(value)
 
-  return value
+    return value
+  }
+
+  evaluateAndValidate.allowUndefined = (options, exp) => {
+    const value = evaluate(options, exp)
+    validate.allowUndefined(value)
+
+    return value
+  }
+
+  return evaluateAndValidate
 }
 
 export const validateExpresion = (options, value) => {
@@ -23,6 +43,11 @@ export const validateExpresion = (options, value) => {
   }
 }
 
-export const evaluateArray = _evaluate.bind(null, validateArray)
-export const evaluateNumber = _evaluate.bind(null, validateNumber)
-export const evaluatePlainObject = _evaluate.bind(null, validatePlainObject)
+export const evaluateArray = _evaluate(validateArray)
+export const evaluateNumber = _evaluate(validateNumber)
+export const evaluatePlainObject = _evaluate(validatePlainObject)
+export const evaluateString = _evaluate(validateString)
+export const evaluateBoolean = _evaluate(validateBoolean)
+export const evaluateNotObject = _evaluate(validateNotObject)
+export const evaluatePlainObjectOrArray = _evaluate(validatePlainObjectOrArray)
+export const evaluateStringOrRegExp = _evaluate(validateStringOrRegExp)

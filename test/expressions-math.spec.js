@@ -1,8 +1,9 @@
 import {
   expression,
-  $VALUE,
+  $$VALUE,
   VALUE_EXPRESSIONS,
   MATH_EXPRESSIONS,
+  MATCH_EXPRESSIONS,
   ARRAY_EXPRESSIONS,
   COMPARISON_EXPRESSIONS,
 } from '../src'
@@ -12,11 +13,12 @@ describe('math expressions', () => {
   const evaluate = expression({
     ...VALUE_EXPRESSIONS,
     ...MATH_EXPRESSIONS,
+    ...MATCH_EXPRESSIONS,
     ...ARRAY_EXPRESSIONS,
     ...COMPARISON_EXPRESSIONS
   })
 
-  test('$MATH_SUM - basic', () => {
+  test('$mathSum - basic', () => {
     const obj = {
       'pending': 23,
       'ready': 14,
@@ -24,20 +26,20 @@ describe('math expressions', () => {
     }
 
     expect(evaluate([
-      '$MATH_SUM',
-      ['$path', 'pending'],
-      ['$path', 'ready'],
-      ['$path', 'removal']
+      '$mathSum',
+      ['$value', 'pending'],
+      ['$value', 'ready'],
+      ['$value', 'removal']
     ], obj))
     .toEqual(43)
   })
 
-  test('$MATH_SUM - with $ARRAY_LENGTH', () => {
+  test('$mathSum - with $arrayLength', () => {
     expect(evaluate([
-      '$MATH_SUM',
-      ['$ARRAY_LENGTH', ['$path', 'pending']],
-      ['$ARRAY_LENGTH', ['$path', 'ready']],
-      ['$ARRAY_LENGTH', ['$path', 'removal']]
+      '$mathSum',
+      ['$arrayLength', ['$value', 'pending']],
+      ['$arrayLength', ['$value', 'ready']],
+      ['$arrayLength', ['$value', 'removal']]
     ], {
       pending: ['a', 'b', 'c', 'd', 'e'],
       ready: ['f', 'g', 'h'],
@@ -46,7 +48,7 @@ describe('math expressions', () => {
     .toEqual(12)
   })
 
-  test('$MATH_SUM - $TRANSFORM', () => {
+  test('$mathSum - $transform', () => {
     const obj = {
       pending: ['a', 'b', 'c', 'd', 'e'],
       ready: ['f', 'g', 'h'],
@@ -54,13 +56,13 @@ describe('math expressions', () => {
     }
 
     expect(evaluate([
-      '$TRANSFORM',
+      '$transform',
       {
         total: [
-          '$MATH_SUM',
-          ['$ARRAY_LENGTH', ['$path', 'pending']],
-          ['$ARRAY_LENGTH', ['$path', 'ready']],
-          ['$ARRAY_LENGTH', ['$path', 'removal']],
+          '$mathSum',
+          ['$arrayLength', ['$value', 'pending']],
+          ['$arrayLength', ['$value', 'ready']],
+          ['$arrayLength', ['$value', 'removal']],
         ],
         pending: 'pending',
         ready: 'ready',
@@ -73,7 +75,7 @@ describe('math expressions', () => {
     })
   })
 
-  test.skip('$MATH_SUM - with objectMatch', () => {
+  test('$mathSum - with matchPaths', () => {
 
     const obj1 = {
       pending: [1, 2, 3, 4, 5, 6, 7],
@@ -81,22 +83,22 @@ describe('math expressions', () => {
       removal: [1, 2, 3]
     }
 
-    const $TRANSFORM_TOTAL = ['$TRANSFORM', {
-      total: ['$MATH_SUM',
-        ['$ARRAY_LENGTH', ['$path', 'pending']],
-        ['$ARRAY_LENGTH', ['$path', 'ready']],
-        ['$ARRAY_LENGTH', ['$path', 'removal']],
+    const $transform_TOTAL = ['$transform', {
+      total: ['$mathSum',
+        ['$arrayLength', ['$value', 'pending']],
+        ['$arrayLength', ['$value', 'ready']],
+        ['$arrayLength', ['$value', 'removal']],
       ]
     }]
 
     const $TOTAL_GT_10 = [
-      '$objectMatch',
-      $TRANSFORM_TOTAL,
+      '$matchPaths',
       {
         total: {
           $gt: 10
         }
-      }
+      },
+      $transform_TOTAL,
     ]
 
     expect(evaluate($TOTAL_GT_10, obj1))

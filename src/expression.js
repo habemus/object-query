@@ -1,26 +1,61 @@
 import { curry, isPlainObject } from 'lodash'
 
-export const isExpression = (options, value) => {
-  return Array.isArray(value) && typeof options.interpreters[value[0]] === 'function'
-}
+const _parseContext = (evalOptions, $$ROOT) => {
 
-export const evaluate = (options, expression) => {
-  if (!Array.isArray(expression)) {
-    return expression
+  let { context } = evalOptions
+
+  if (!isPlainObject(context) || !context.hasOwnProperty('$$VALUE')) {
+    //
+    // When the context is not a plain object
+    // or it is a plain object with a '$$VALUE' property defined (even if $$VALUE === undefined)
+    // the algorithm assumes it is the value itself
+    //
+    context = {
+      $$VALUE: context
+    }
   }
 
-  const [expressionId, ...expressionArgs] = expression
-  const { interpreters, context, $ROOT } = options
+  //
+  // Expose $$ROOT to the context
+  //
+  context.$$ROOT = $$ROOT
 
-  // console.log('evaluate', expressionId, expressionArgs)
+  return context
+}
 
-  return typeof interpreters[expressionId] === 'function' ?
-    interpreters[expressionId]({
-      interpreters,
-      $ROOT: $ROOT !== undefined ? $ROOT : context,
-      context
-    }, ...expressionArgs) :
-    expression
+const _parseRoot = (evalOptions) => {
+  return evalOptions.hasOwnProperty('$$ROOT') ? evalOptions.$$ROOT : evalOptions.context
+}
+
+export const isExpressionId = (evalOptions, value) => {
+  return typeof evalOptions.interpreters[value] === 'function'
+}
+
+export const isExpression = (evalOptions, value) => {
+  return Array.isArray(value) && isExpressionId(evalOptions, value[0])
+}
+
+export const evaluate = (evalOptions, expOrValue) => {
+  if (!Array.isArray(expOrValue)) {
+    return expOrValue
+  }
+
+  const [expressionId, ...expressionArgs] = expOrValue
+  const { interpreters } = evalOptions
+  const interpreterFn = interpreters[expressionId]
+
+  if (typeof interpreterFn !== 'function') {
+    return expOrValue
+  }
+
+  const $$ROOT = _parseRoot(evalOptions)
+  const context = _parseContext(evalOptions, $$ROOT)
+
+  return interpreterFn({
+    interpreters,
+    $$ROOT,
+    context
+  }, ...expressionArgs)
 }
 
 export const expression = curry((interpreters, exp, context) => {

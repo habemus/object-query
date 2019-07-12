@@ -1,6 +1,6 @@
 import {
   expression,
-  $VALUE,
+  $$VALUE,
   VALUE_EXPRESSIONS,
   LOGICAL_EXPRESSIONS,
   COMPARISON_EXPRESSIONS,
@@ -20,7 +20,7 @@ describe('array expressions', () => {
 
   test('$arrayLength', () => {
     const array = [1, 2, 3]
-    const $arrayLength = ['$arrayLength', $VALUE]
+    const $arrayLength = ['$arrayLength', $$VALUE]
 
     expect(evaluate($arrayLength, array)).toEqual(3)
     expect(evaluate(['$eq', $arrayLength, 3], array)).toEqual(true)
@@ -30,8 +30,8 @@ describe('array expressions', () => {
     const array = [1, 2, 3]
     const $arraySum10 = [
       '$arrayMap',
-      ['$path', '$ROOT'],
-      ['$mathSum', $VALUE, 10]
+      ['$value', '$$ROOT'],
+      ['$mathSum', $$VALUE, 10]
     ]
 
     expect(evaluate($arraySum10, array))
@@ -46,14 +46,14 @@ describe('array expressions', () => {
 
     const divisibleBy3Count = evaluate([
       '$arrayMap',
-      ['$path', 'lists_of_numbers'],
+      ['$value', 'lists_of_numbers'],
       ['$arrayLength',
         ['$arrayFilter',
-          $VALUE,
+          $$VALUE,
           ['$eq',
             ['$mathMod',
-              $VALUE,
-              ['$path', '$ROOT.divisor']
+              $$VALUE,
+              ['$value', '$$ROOT.divisor']
             ],
             0
           ]
@@ -78,15 +78,15 @@ describe('array expressions', () => {
 
     console.log(evaluate([
       '$arrayFilter',
-      ['$path', 'people'],
+      ['$value', 'people'],
       ['$or',
         ['$gte',
-          ['$path', 'parentAge'],
-          ['$mathSum', ['$path', 'age'], 20]
+          ['$value', 'parentAge'],
+          ['$mathSum', ['$value', 'age'], 20]
         ],
         ['$eq',
-          ['$path', '$ROOT.specificAge'],
-          ['$path', 'age']
+          ['$value', '$$ROOT.specificAge'],
+          ['$value', 'age']
         ]
       ]
     ], {
@@ -94,5 +94,51 @@ describe('array expressions', () => {
       people
     }))
 
+  })
+
+  test('$arrayReduce', () => {
+    const people = [
+      { name: 'João', age: 24, parentAge: 44 },
+      { name: 'Diana', age: 25, parentAge: 50, },
+      { name: 'Ricardo', age: 55, parentAge: 90 },
+      { name: 'Rafael', age: 40, parentAge: 70 },
+      { name: 'Ana', age: 30, parentAge: 45 },
+    ]
+
+    // console.log(evaluate([
+    //   '$arrayReduce',
+    //   ['$value', null],
+    //   ['$mathSum',
+    //     ['$value', '$$ACC'],
+    //     ['$value', 'age']
+    //   ],
+    //   0
+    // ], people))
+
+    console.log(evaluate([
+      '$arrayReduce',
+      ['$value', null],
+      ['$transform', {
+        names: ['$arrayPush',
+          ['$value', '$$ACC.names', []],
+          ['$value', 'name']
+        ],
+        ages: ['$arrayPush',
+          ['$value', '$$ACC.ages', []],
+          ['$value', 'age']
+        ],
+        agesInverted: ['$arrayUnshift',
+          ['$value', '$$ACC.agesInverted', []],
+          ['$value', 'age']
+        ],
+        ageSum: ['$mathSum',
+          ['$value', '$$ACC.ageSum'],
+          ['$value', 'age']
+        ],
+      }],
+      {
+        ageSum: 0,
+      }
+    ], people))
   })
 })

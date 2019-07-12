@@ -1,6 +1,6 @@
 import {
   expression,
-  $VALUE,
+  $$VALUE,
   VALUE_EXPRESSIONS
 } from '../src'
 
@@ -31,27 +31,27 @@ describe('VALUE_EXPRESSIONS', () => {
     })
 
     test('$literal', () => {
-      expect(evaluate(['$literal', ['$path', 'literal']], null))
-        .toEqual(['$path', 'literal'])
+      expect(evaluate(['$literal', ['$value', 'literal']], null))
+        .toEqual(['$value', 'literal'])
       expect(evaluate(['$literal', ['$literal', 'literal']], null))
         .toEqual(['$literal', 'literal'])
     })
   })
 
-  describe('$path', () => {
+  describe('$value', () => {
     test('root', () => {
-      expect(evaluate(['$path', null], NUMBER)).toEqual(NUMBER)
-      expect(evaluate(['$path', null], STRING)).toEqual(STRING)
-      expect(evaluate(['$path', null], BOOLEAN)).toEqual(BOOLEAN)
-      expect(evaluate(['$path', null], ARRAY)).toEqual(ARRAY)
+      expect(evaluate(['$value', null], NUMBER)).toEqual(NUMBER)
+      expect(evaluate(['$value', null], STRING)).toEqual(STRING)
+      expect(evaluate(['$value', null], BOOLEAN)).toEqual(BOOLEAN)
+      expect(evaluate(['$value', null], ARRAY)).toEqual(ARRAY)
 
-      expect(evaluate($VALUE, 'Any value')).toEqual('Any value')
+      expect(evaluate($$VALUE, 'Any value')).toEqual('Any value')
     })
 
     test('path', () => {
-      expect(evaluate(['$path', 'string'], OBJECT)).toEqual('String value')
-      expect(evaluate(['$path', 'nested.key'], OBJECT)).toEqual('Nested value')
-      expect(evaluate(['$path', 'nested.array.0'], OBJECT)).toEqual(123)
+      expect(evaluate(['$value', 'string'], OBJECT)).toEqual('String value')
+      expect(evaluate(['$value', 'nested.key'], OBJECT)).toEqual('Nested value')
+      expect(evaluate(['$value', 'nested.array.0'], OBJECT)).toEqual(123)
     })
   })
 })
